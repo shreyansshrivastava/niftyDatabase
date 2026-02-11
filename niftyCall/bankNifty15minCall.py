@@ -16,7 +16,10 @@ INTERVAL = interval15min
 tz = pytz.timezone("Asia/Kolkata")
 
 end_date = datetime.now(tz)
-start_date = end_date - timedelta(days=days)
+import re
+# Extract digits from a string like "30d" and convert to int
+clean_days = int(re.search(r'\d+', days).group())
+start_date = end_date - timedelta(days=clean_days)
 
 
 def download_nifty_15m():

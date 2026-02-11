@@ -4,32 +4,49 @@ import yfinance as yf
 import pandas as pd
 import mplfinance as mpf
 from io import BytesIO
-from config import symbol, days, intervalDay
+from config import symbol, days, interval15min
 from growwapi import GrowwAPI
 from growwCall import getAccessToken
 import time
 def saveImages():
+    print("Inside image saved")
 
-
-    df = yf.download(symbol, period=days, interval= intervalDay, auto_adjust=False,
+    df = yf.download(symbol, period=days, interval= interval15min, auto_adjust=False,
         progress=False)
 
+
+
     if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
+        df.columns = ['_'.join(col).strip() for col in df.columns.values]
 
+    df = df[[f'Open_{symbol}', f'High_{symbol}', f'Low_{symbol}', f'Close_{symbol}', f'Volume_{symbol}']]
 
-    df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
-
-    df = df.apply(pd.to_numeric, errors='coerce')
+    # 4. Rename to standard OHLCV
+    df.rename(columns={
+        f'Open_{symbol}': 'Open',
+        f'High_{symbol}': 'High',
+        f'Low_{symbol}': 'Low',
+        f'Close_{symbol}': 'Close',
+        f'Volume_{symbol}': 'Volume'
+    }, inplace=True)
 
     df.dropna(inplace=True)
 
+    # df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
+    #
+    # df = df.apply(pd.to_numeric, errors='coerce')
+
+    # df.dropna(inplace=True)
+
     df.index = pd.to_datetime(df.index)
-    df.index = df.index.tz_convert('Asia/Kolkata')
+    if df.index.tz is None:
+        df.index = df.index.tz_localize('UTC').tz_convert('Asia/Kolkata')
+    else:
+        df.index = df.index.tz_convert('Asia/Kolkata')
+
     df['date'] = df.index.date
     grouped = df.groupby('date')
-    interval = config.intervalDay
-    #checkDbTable.checkTable()
+    interval = interval15min
     for date, day_df in df.groupby('date'):
         day_df = day_df.drop(columns=['date'])
 

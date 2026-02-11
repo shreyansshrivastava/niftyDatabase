@@ -6,7 +6,8 @@ from io import BytesIO
 from datetime import datetime, timedelta
 import pytz
 from databaseFile.databaseConnection import conn
-from config import symbol,days, intervalHr
+from config import symbol, days, intervalHr
+
 cur = conn.cursor()
 import tempfile
 
@@ -17,7 +18,10 @@ INTERVAL = intervalHr
 tz = pytz.timezone("Asia/Kolkata")
 
 end_date = datetime.now(tz)
-start_date = end_date - timedelta(days=days)
+import re
+# Extract digits from a string like "30d" and convert to int
+clean_days = int(re.search(r'\d+', days).group())
+start_date = end_date - timedelta(days=clean_days)
 
 with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
     tmp_path = tmp.name
