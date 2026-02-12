@@ -247,9 +247,13 @@ def run():
 
         feats = build_features(pattern_df)
         labels = build_labels(pattern_df, future_df)
-
+        pattern_name = classify_pattern(
+            feats["volatility"],
+            feats["range_ratio"],
+            feats["pattern_length"]
+        )
         record = {
-            "pattern_name": "UNLABELED",
+            "pattern_name": pattern_name,
             "symbol": SYMBOL,
             "timeframe": INTERVAL,
             "shape_vector": shape,
@@ -270,6 +274,21 @@ def run():
     conn.commit()
     print(f"✅ Done. Inserted {inserted} fingerprints")
 
+def classify_pattern(volatility, range_ratio, candle_count):
 
+    if volatility > 2.0 and range_ratio > 0.6:
+        return "High Volatility Breakout"
+
+    elif range_ratio < 0.25:
+        return "Consolidation"
+
+    elif volatility < 0.005:
+        return "Low Volatility Range"
+
+    elif candle_count > 30:
+        return "Trend Expansion"
+
+    else:
+        return "Neutral Trend"
 # ================= RUN =================
 
