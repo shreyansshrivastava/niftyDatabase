@@ -10,7 +10,7 @@ from growwCall import getAccessToken
 import time
 def saveImages():
     print("Inside image saved")
-
+    symbol = "^NSEI"
     # df = yf.download(symbol, period=days, interval= interval15min, auto_adjust=False,
     #     progress=False)
     df = yf.download(
@@ -75,7 +75,7 @@ def saveImages():
         # Insert into DB
         print(f"Saved image for {date} to DB")
         close_bytes = day_df['Close'].values.tobytes()
-        insertDataDb.insertDataDay(date, interval, close_bytes, image_bytes)
+        insertDataDb.insertNifty50DataDay(date, interval, close_bytes, image_bytes)
     print("Candlestick image saved")
 
 
