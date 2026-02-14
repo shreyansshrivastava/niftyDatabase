@@ -1,9 +1,9 @@
-PERIOD = "2d"
+PERIOD = "3d"
 symbol="^NSEBANK"
 interval="5m"
-days= "2d"
+days= "3d"
 interval15min = "15m"
-intervalDay = "1d"
+intervalDay = "3d"
 intervalHr = "1h"
 hrdays = 1
 
